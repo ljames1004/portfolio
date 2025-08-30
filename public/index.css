@@ -1,0 +1,87 @@
+.dark {
+    background-color: rgb(10 10 10 / var(--tw-bg-opacity, 1)) !important;
+}
+
+.toggle-text {
+    color: rgb(10 10 10 / var(--tw-bg-opacity, 1));
+}
+
+.text-white {
+    color: #fff !important;
+}
+
+.text-accent-green {
+    color: #61fe25;
+}
+
+.text-accent-white-green {
+    color: #a5f187 !important;
+}
+
+.text-accent-green-hover:hover {
+    color: #9ef57b;
+    transition-duration: 300ms;
+}
+
+.progress-btn {
+    border: none;
+    color: #fff;
+    color: var(--white-color);
+    cursor: pointer;
+    font-size: 16px;
+    overflow: hidden;
+    position: relative;
+    transition: color .3s ease;
+}
+
+.progress-btn:hover:before {
+    width: 100%;
+}
+
+.progress-btn:before {
+    background: #32cd32;
+    bottom: 0;
+    content: "";
+    height: 3px;
+    left: 0;
+    position: absolute;
+    top: 50%;
+    transition: width .4s ease;
+    width: 0;
+}
+
+.fixed-nav {
+    position: fixed;
+    display: flex;
+    z-index: 4;
+    transform: rotate(-90deg);
+    top: 30%;
+    left: 0%;
+}
+
+.fixed-header {
+    width: 100%;
+    text-align: right;
+    padding: 20px;
+    background: #fff;
+}
+
+.project-btn-container {
+    width: -webkit-fit-content;
+    width: fit-content;
+}
+
+.project-btn {
+    background-color: #61fe25;
+    background-color: var(--main-color);
+    box-sizing: border-box;
+    color: #111;
+    color: var(--dark-color);
+    cursor: pointer;
+    font-size: 1.125rem;
+    font-weight: 500;
+    line-height: 3;
+    padding: 1rem 4.5rem;
+    position: relative;
+    width: 55%;
+}
