@@ -1,83 +1,60 @@
-# Use PHP 8.2 to match Laravel 12 requirements
+# Use PHP 8.2 with FPM and Nginx
 FROM php:8.2-fpm
 
-# Install system dependencies and PHP extensions
+# Set working directory
+WORKDIR /var/www
+
+# Install system dependencies
 RUN apt-get update && apt-get install -y \
+    git \
+    curl \
     libpng-dev \
-    libjpeg-dev \
-    libfreetype6-dev \
-    libzip-dev \
     libonig-dev \
     libxml2-dev \
-    git \
+    libzip-dev \
+    zip \
     unzip \
-    curl \
-    && docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install -j$(nproc) \
-        gd \
-        mbstring \
-        exif \
-        pcntl \
-        bcmath \
-        pdo \
-        pdo_sqlite \
-        zip \
-        xml
+    nginx \
+    sqlite3 \
+    && docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd zip
 
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# Set up working directory
-WORKDIR /var/www
-
-# Copy the entire Laravel project
-COPY . .
-
-# Create .env file if it doesn't exist
-RUN if [ ! -f .env ]; then \
-        echo "APP_NAME=Portfolio" > .env && \
-        echo "APP_ENV=production" >> .env && \
-        echo "APP_KEY=" >> .env && \
-        echo "APP_DEBUG=false" >> .env && \
-        echo "APP_URL=http://localhost:8000" >> .env && \
-        echo "LOG_CHANNEL=stack" >> .env && \
-        echo "LOG_DEPRECATIONS_CHANNEL=null" >> .env && \
-        echo "LOG_LEVEL=debug" >> .env && \
-        echo "DB_CONNECTION=sqlite" >> .env && \
-        echo "DB_DATABASE=/var/www/database/database.sqlite" >> .env && \
-        echo "BROADCAST_DRIVER=log" >> .env && \
-        echo "CACHE_DRIVER=file" >> .env && \
-        echo "FILESYSTEM_DISK=local" >> .env && \
-        echo "QUEUE_CONNECTION=sync" >> .env && \
-        echo "SESSION_DRIVER=file" >> .env && \
-        echo "SESSION_LIFETIME=120" >> .env; \
-    fi
+# Copy application files
+COPY . /var/www
 
 # Install PHP dependencies
 RUN composer install --no-dev --optimize-autoloader --no-interaction
 
-# Set the proper file permissions for Laravel
-RUN chown -R www-data:www-data /var/www && \
-    chmod -R 775 /var/www/storage /var/www/bootstrap/cache
+# Install Node.js dependencies and build assets
+RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \
+    && apt-get install -y nodejs \
+    && npm ci --only=production \
+    && npm run build
 
-# Create SQLite database if it doesn't exist and set permissions
-RUN touch database/database.sqlite && \
-    chmod 664 database/database.sqlite && \
-    chown www-data:www-data database/database.sqlite
+# Set permissions
+RUN chown -R www-data:www-data /var/www \
+    && chmod -R 755 /var/www/storage \
+    && chmod -R 755 /var/www/bootstrap/cache
 
-# Generate application key
-RUN php artisan key:generate --no-interaction
+# Create SQLite database if it doesn't exist
+RUN touch /var/www/database/database.sqlite \
+    && chown www-data:www-data /var/www/database/database.sqlite
 
 # Run migrations
-RUN php artisan migrate --force --no-interaction
+RUN php artisan migrate --force
 
-# Clear and cache config
-RUN php artisan config:cache && \
-    php artisan route:cache && \
-    php artisan view:cache
+# Optimize Laravel for production
+RUN php artisan config:cache \
+    && php artisan route:cache \
+    && php artisan view:cache
 
-# Expose port 9000 for PHP-FPM
-EXPOSE 9000
+# Copy Nginx configuration
+COPY nginx.conf /etc/nginx/sites-available/default
 
-# Start PHP-FPM
-CMD ["php-fpm"]
+# Expose port
+EXPOSE 80
+
+# Start Nginx and PHP-FPM
+CMD service nginx start && php-fpm

@@ -22,3 +22,7 @@
 Homestead.json
 Homestead.yaml
 Thumbs.db
+
+# IMPORTANT: For Render deployment, you need to include the SQLite database
+# Remove or comment out the following line if it exists:
+# /database/database.sqlite
