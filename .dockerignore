@@ -1,10 +1,19 @@
+# Git and version control
 .git
 .gitignore
+.gitattributes
+
+# Documentation
 README.md
-.env
+*.md
+
+# Environment files
+.env*
 .env.example
 .env.backup
 .env.production
+
+# IDE and editor files
 .phpactor.json
 .phpunit.result.cache
 /.fleet
@@ -13,20 +22,49 @@ README.md
 /.phpunit.cache
 /.vscode
 /.zed
-/auth.json
-/node_modules
+Thumbs.db
+
+# Dependencies (will be installed in container)
+node_modules/
+vendor/
 /public/build
 /public/hot
-/public/storage
+
+# Storage and cache
 /storage/*.key
 /storage/pail
-/vendor
-Homestead.json
-Homestead.yaml
-Thumbs.db
+/storage/logs/*
+/storage/framework/cache/*
+/storage/framework/sessions/*
+/storage/framework/views/*
+
+# Testing
+/tests
+phpunit.xml
+
+# Docker files
 Dockerfile
+Dockerfile.prod
 .dockerignore
 docker-compose.yml
 docker-run.bat
 docker-run.sh
+docker-build.sh
+
+# Deployment
 render.yaml
+render.yaml.example
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Temporary files
+*.tmp
+*.temp
