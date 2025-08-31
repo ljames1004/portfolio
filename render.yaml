@@ -1,40 +1,28 @@
 services:
   - type: web
-    name: laravel-backend
-    env: php
+    name: laravel-portfolio
+    env: docker
     plan: free
-    buildCommand: |
-      # Install PHP dependencies
-      composer install --optimize-autoloader --no-dev
-      # Install frontend dependencies (if using npm or yarn)
-      npm install
-      # Build assets
-      npm run production
-      # Generate application key
-      php artisan key:generate
-      # Run migrations (optional)
-      php artisan migrate --force
-    startCommand: |
-      # Start the Laravel server
-      php artisan serve --host 0.0.0.0 --port 10000
+    dockerfilePath: ./Dockerfile.prod
+    dockerContext: .
     envVars:
       - key: APP_KEY
-        value: base64:lincoln-app-key
+        generateValue: true
       - key: APP_ENV
         value: production
       - key: APP_DEBUG
         value: false
       - key: APP_URL
-        value: https://lincoln-portfolio.onrender.com
+        value: https://your-app-name.onrender.com
       - key: DB_CONNECTION
-        value: mysql
-      - key: DB_HOST
-        value: localhost
-      - key: DB_PORT
-        value: 3306
+        value: sqlite
       - key: DB_DATABASE
-        value: your_database_name
-      - key: DB_USERNAME
-        value: your_database_user
-      - key: DB_PASSWORD
-        value: your_database_password
+        value: /var/www/database/database.sqlite
+      - key: LOG_CHANNEL
+        value: stack
+      - key: CACHE_DRIVER
+        value: file
+      - key: SESSION_DRIVER
+        value: file
+      - key: QUEUE_CONNECTION
+        value: sync
